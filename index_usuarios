@@ -1,0 +1,38 @@
+//index usuarios
+import dotenv from "dotenv"
+import { obtenerUsuarios } from './src/routes';
+import { connectDB } from './conexion/db';
+import express, { Request, Response } from 'express';
+
+
+
+
+dotenv.config();
+
+const app = express();
+const port = process.env.PORT || 3002;
+
+app.use(express.json());
+
+app.use("/usuarios", obtenerUsuarios); // Usar el router
+
+app.get("/", (_req, res) => {
+  res.send("Hola Unach, servidor 3002");
+})
+
+// Endpoint para obtener usuarios
+app.get('/users', async (_req: Request, res: Response) => {
+  try {
+      const connection = await connectDB();
+      const [rows] = await connection.execute('SELECT * FROM usuarios');
+      res.json(rows);
+  } catch (error) {
+      console.error('Error en la consulta:', error);
+      res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+app.listen(port, () => {
+    console.log(`Servidor corriendo en http://localhost:${port}`);
+  });
+
+
